@@ -1,0 +1,33 @@
+import requests
+from concurrent.futures import ThreadPoolExecutor
+
+cookie_str = "qser=xxx; ci_sessions=yyy"  
+
+cookies = {
+    item.split('=')[0].strip(): item.split('=')[1].strip()
+    for item in cookie_str.split(';')
+    if '=' in item
+}
+
+url = "https://copicaward.com/work/vote?revision_id=10&work_id=30820&score=1"
+
+headers = {
+    "User-Agent": "Mozilla/5.0",
+    "Referer": "https://copicaward.com/work/detail/30820"
+}
+
+def vote(i):
+    while True:
+        response = requests.get(url, cookies=cookies, headers=headers)
+
+        print(f"[{i}] 狀態碼: {response.status_code}")
+        print(f"[{i}] 回應: {response.text}")
+
+
+if __name__ == "__main__":
+    TOTAL_TASKS = 20
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        executor.map(vote, range(TOTAL_TASKS))
+
+    print("🎉 全部完成")
